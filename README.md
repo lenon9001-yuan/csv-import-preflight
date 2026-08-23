@@ -2,6 +2,8 @@
 
 Marketing site for a local-first CSV cleaner and CRM import preflight tool.
 
+**Live site:** [csv-import-preflight.vercel.app](https://csv-import-preflight.vercel.app)
+
 ## Local development
 
 ```bash
