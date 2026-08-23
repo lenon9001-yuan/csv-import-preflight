@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Check, clean, and prepare CSV files before importing them into your CRM. Your data stays in your browser." />
+    <meta name="theme-color" content="#f4f7fb" />
+    <meta property="og:title" content="CSV Import Preflight" />
+    <meta property="og:description" content="Know what will break before you import." />
+    <meta property="og:type" content="website" />
+    <title>CSV Import Preflight — Clean data before your CRM import</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet" />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="CSV Import Preflight home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>CSV Import Preflight</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <a href="#workflow">How it works</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#beta">Beta</a>
+      </nav>
+      <a class="header-cta" href="#demo">Run the sample <span aria-hidden="true">↓</span></a>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="live-dot"></span> Local-first CSV quality check</div>
+          <h1>Know what will break<br /><em>before</em> you import.</h1>
+          <p class="hero-lede">Catch duplicates, missing fields, and formatting problems before they reach your CRM. Fix the file locally, export a clean copy, and keep the original untouched.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#demo">Check the sample file</a>
+            <a class="text-link" href="#workflow">See the workflow <span aria-hidden="true">→</span></a>
+          </div>
+          <ul class="proof-strip" aria-label="Product principles">
+            <li><span>01</span>No upload</li>
+            <li><span>02</span>No account</li>
+            <li><span>03</span>Clear audit trail</li>
+          </ul>
+        </div>
+
+        <div class="preflight-card" id="demo">
+          <div class="card-titlebar">
+            <div>
+              <span class="file-icon">CSV</span>
+              <div><strong>contacts_august.csv</strong><small>1,248 rows · 9 columns</small></div>
+            </div>
+            <span class="local-badge">LOCAL</span>
+          </div>
+          <div class="scan-rail" aria-label="Sample file status">
+            <div class="rail-label"><span>Preflight status</span><strong id="scan-status">Ready to inspect</strong></div>
+            <div class="rail-track"><i id="scan-progress"></i></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Row</th><th>Email</th><th>Phone</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>0182</td><td>maya@north.co</td><td>+60 12 884 0931</td><td><span class="status status-ready">Ready</span></td></tr>
+                <tr class="issue-row"><td>0183</td><td>liam@acme</td><td>012-44</td><td><span class="status status-error">2 issues</span></td></tr>
+                <tr class="issue-row"><td>0184</td><td>maya@north.co</td><td>+60128840931</td><td><span class="status status-warn">Duplicate</span></td></tr>
+                <tr><td>0185</td><td>ana@lumen.io</td><td>+44 7700 900321</td><td><span class="status status-ready">Ready</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="results" id="results" aria-live="polite">
+            <div><strong>1,193</strong><span>ready rows</span></div>
+            <div><strong>31</strong><span>need review</span></div>
+            <div><strong>24</strong><span>duplicates</span></div>
+          </div>
+          <button class="scan-button" id="scan-button" type="button"><span>Run sample preflight</span><kbd>↵</kbd></button>
+          <p class="card-footnote"><span aria-hidden="true">◆</span> Sample data only. The full product processes files in your browser.</p>
+        </div>
+      </section>
+
+      <section class="problem-band" aria-label="The problem">
+        <p>CRM imports fail quietly.</p>
+        <div class="problem-ticker" aria-hidden="true">
+          <span>INVALID EMAIL</span><i></i><span>DUPLICATE CONTACT</span><i></i><span>MISSING OWNER</span><i></i><span>WRONG DATE FORMAT</span><i></i><span>BROKEN PHONE</span>
+        </div>
+      </section>
+
+      <section class="workflow section" id="workflow">
+        <div class="section-heading">
+          <span class="section-kicker">A controlled workflow</span>
+          <h2>From messy export to import-ready file.</h2>
+          <p>Every change stays visible. Review the exceptions instead of hunting through thousands of cells.</p>
+        </div>
+        <div class="workflow-grid">
+          <article>
+            <span class="step-number">1 / 3</span>
+            <div class="step-visual upload-visual" aria-hidden="true"><span>contacts.csv</span><i>↓</i></div>
+            <h3>Choose your file</h3>
+            <p>Open a CSV locally. The file stays on your device—there is no server upload.</p>
+          </article>
+          <article>
+            <span class="step-number">2 / 3</span>
+            <div class="step-visual rules-visual" aria-hidden="true"><span>Email</span><b>Required · Unique</b><span>Phone</span><b>Normalize</b></div>
+            <h3>Set the checks</h3>
+            <p>Match columns and choose simple rules for required fields, formats, and duplicates.</p>
+          </article>
+          <article>
+            <span class="step-number">3 / 3</span>
+            <div class="step-visual export-visual" aria-hidden="true"><i>✓</i><span>clean.csv</span><small>+ audit report</small></div>
+            <h3>Export with confidence</h3>
+            <p>Download clean rows, rejected rows, and a plain-language report of every change.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="privacy section" id="privacy">
+        <div class="privacy-panel">
+          <div class="privacy-copy">
+            <span class="section-kicker">Designed around real customer data</span>
+            <h2>Your contact list does not become our contact list.</h2>
+            <p>CSV Import Preflight is designed to run in your browser. No file storage, no account database, and no training on your records.</p>
+          </div>
+          <div class="privacy-diagram" aria-label="Local processing diagram">
+            <div><span>Your CSV</span><small>on your device</small></div>
+            <i aria-hidden="true">→</i>
+            <div class="browser-box"><span>Preflight</span><small>in your browser</small></div>
+            <i aria-hidden="true">→</i>
+            <div><span>Clean CSV</span><small>back to you</small></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="beta section" id="beta">
+        <div>
+          <span class="section-kicker">Private beta · coming soon</span>
+          <h2>One clean import is worth<br />a week of CRM cleanup.</h2>
+        </div>
+        <div class="beta-copy">
+          <p>The first release will support CSV files, required fields, email and phone checks, date normalization, exact-match deduplication, and exportable reports.</p>
+          <a class="button button-light" href="#demo">Run the sample</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><span>CSV Import Preflight</span></a>
+      <p>Built for careful imports, not careless uploads.</p>
+      <span>© <span id="year"></span> · Early product preview</span>
+    </footer>
+  </body>
+</html>
