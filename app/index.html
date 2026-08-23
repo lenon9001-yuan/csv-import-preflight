@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Check and clean a CSV locally before importing it into your CRM." />
+    <meta name="theme-color" content="#eef3f9" />
+    <title>CSV Import Preflight — Local cleaner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet" />
+    <script type="module" src="/src/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">Skip to workspace</a>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="CSV Import Preflight home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>CSV Import Preflight</span>
+      </a>
+      <div class="engine-status"><span></span>Local engine active</div>
+      <div class="header-actions">
+        <span>No file upload</span>
+        <button class="quiet-button hidden" id="start-over" type="button">Start over</button>
+        <a href="/">Back to site</a>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <aside class="flight-plan" aria-label="Preflight progress">
+        <div class="plan-heading">
+          <span class="mono-label">Preflight plan</span>
+          <strong id="plan-status">Awaiting file</strong>
+        </div>
+        <ol>
+          <li class="active" data-plan-step="1">
+            <span>1</span><div><strong>Load</strong><small>Choose a local CSV</small></div>
+          </li>
+          <li data-plan-step="2">
+            <span>2</span><div><strong>Map</strong><small>Set fields and rules</small></div>
+          </li>
+          <li data-plan-step="3">
+            <span>3</span><div><strong>Review</strong><small>Inspect and export</small></div>
+          </li>
+        </ol>
+        <div class="privacy-stamp">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.8 8.7 7 10 4.2-1.3 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+          <div><strong>Browser-only processing</strong><span>This tab reads the file. Our server does not.</span></div>
+        </div>
+        <div class="file-ticket hidden" id="file-ticket">
+          <span class="ticket-type">CSV</span>
+          <div><strong id="ticket-name"></strong><small id="ticket-meta"></small></div>
+        </div>
+      </aside>
+
+      <section class="workspace" id="workspace">
+        <div class="notice notice-error hidden" id="global-error" role="alert">
+          <strong>Preflight stopped</strong><span id="global-error-text"></span>
+        </div>
+
+        <section class="stage active" id="stage-load" aria-labelledby="load-title">
+          <div class="workspace-heading">
+            <div><span class="mono-label">Step 1 · Load</span><h1 id="load-title">Bring the file.<br />Keep the data.</h1></div>
+            <p>Choose one CSV from your device. It is parsed inside this browser tab and is never sent to our server.</p>
+          </div>
+
+          <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Choose a CSV file">
+            <input id="file-input" type="file" accept=".csv,text/csv" hidden />
+            <div class="drop-icon" aria-hidden="true"><span>CSV</span><i>↓</i></div>
+            <h2>Drop a CSV here</h2>
+            <p>or choose a file from your device</p>
+            <button class="primary-button" id="choose-file" type="button">Choose CSV</button>
+            <div class="drop-limits"><span>CSV only</span><i></i><span>20 MB maximum</span><i></i><span>UTF-8 recommended</span></div>
+          </div>
+
+          <div class="sample-route">
+            <div><span class="mono-label">No file ready?</span><strong>Take the sample route</strong><p>Use 8 fictional contacts with duplicates, formatting changes, and invalid fields.</p></div>
+            <button class="secondary-button" id="load-sample" type="button">Load fictional sample <span>→</span></button>
+          </div>
+        </section>
+
+        <section class="stage" id="stage-map" aria-labelledby="map-title">
+          <div class="workspace-heading compact">
+            <div><span class="mono-label">Step 2 · Map</span><h1 id="map-title">Tell us what<br />each column means.</h1></div>
+            <p>Nothing is changed yet. Map the fields you want checked, then choose the rules for this import.</p>
+          </div>
+
+          <div class="file-overview">
+            <div><span>Rows</span><strong id="overview-rows">—</strong></div>
+            <div><span>Columns</span><strong id="overview-columns">—</strong></div>
+            <div><span>Delimiter</span><strong id="overview-delimiter">—</strong></div>
+            <div><span>File size</span><strong id="overview-size">—</strong></div>
+          </div>
+
+          <form id="mapping-form">
+            <section class="mapping-block">
+              <div class="block-heading"><span>Field map</span><p>Choose “Not mapped” when the file has no matching column.</p></div>
+              <div class="select-grid">
+                <label><span>Email column</span><select id="email-field"></select></label>
+                <label><span>Phone column</span><select id="phone-field"></select></label>
+                <label><span>Date column</span><select id="date-field"></select></label>
+              </div>
+            </section>
+
+            <section class="mapping-block">
+              <div class="block-heading"><span>Required fields</span><p>Rows missing one of these fields go to <code>rejected.csv</code>.</p></div>
+              <div class="check-grid" id="required-fields"></div>
+            </section>
+
+            <section class="mapping-block split-rules">
+              <div>
+                <div class="block-heading"><span>Duplicate match</span><p>The first contact stays clean. Later exact matches are separated.</p></div>
+                <div class="check-grid narrow" id="dedupe-fields"></div>
+              </div>
+              <div class="rule-selects">
+                <label><span>Default phone country</span><select id="default-country">
+                  <option value="">International + numbers only</option>
+                  <option value="MY" selected>Malaysia (+60)</option>
+                  <option value="SG">Singapore (+65)</option>
+                  <option value="US">United States (+1)</option>
+                  <option value="CA">Canada (+1)</option>
+                  <option value="GB">United Kingdom (+44)</option>
+                  <option value="AU">Australia (+61)</option>
+                </select></label>
+                <label><span>Ambiguous date order</span><select id="date-order">
+                  <option value="AUTO">Do not guess</option>
+                  <option value="DMY" selected>Day / month / year</option>
+                  <option value="MDY">Month / day / year</option>
+                </select></label>
+              </div>
+            </section>
+
+            <section class="preview-block">
+              <div class="block-heading"><span>Source preview</span><p>First five rows. Long values are shortened here only.</p></div>
+              <div class="data-table-wrap"><table id="source-preview"></table></div>
+            </section>
+
+            <div class="form-footer">
+              <p><span>◆</span> The original file stays untouched.</p>
+              <button class="primary-button run-button" type="submit">Run preflight <span>→</span></button>
+            </div>
+          </form>
+        </section>
+
+        <section class="stage" id="stage-results" aria-labelledby="results-title">
+          <div class="results-heading">
+            <div><span class="mono-label">Step 3 · Review</span><h1 id="results-title">Preflight complete.</h1><p id="result-summary-text"></p></div>
+            <div class="completion-seal"><span>✓</span><strong>Processed locally</strong><small id="completed-file-name"></small></div>
+          </div>
+
+          <div class="metric-grid">
+            <button class="metric active" data-filter="all" type="button"><span>Total rows</span><strong id="metric-total">0</strong><small>all source records</small></button>
+            <button class="metric metric-clean" data-filter="clean" type="button"><span>Ready</span><strong id="metric-clean">0</strong><small>safe to import</small></button>
+            <button class="metric metric-changed" data-filter="changed" type="button"><span>Auto-fixed</span><strong id="metric-changed">0</strong><small>included in clean</small></button>
+            <button class="metric metric-reject" data-filter="rejected" type="button"><span>Rejected</span><strong id="metric-rejected">0</strong><small>needs a decision</small></button>
+            <button class="metric metric-dupe" data-filter="duplicate" type="button"><span>Duplicates</span><strong id="metric-duplicates">0</strong><small>separated safely</small></button>
+          </div>
+
+          <section class="review-block">
+            <div class="review-toolbar">
+              <div><span class="mono-label">Row manifest</span><strong id="filter-title">All rows</strong></div>
+              <p id="result-limit-note"></p>
+            </div>
+            <div class="data-table-wrap results-table-wrap"><table id="results-table"></table></div>
+          </section>
+
+          <section class="export-section">
+            <div class="export-heading"><span class="mono-label">Export package</span><h2>Four files. No mystery.</h2><p>Each download has one job, so you can import clean records and review everything else separately.</p></div>
+            <div class="export-grid">
+              <button data-download="clean.csv" type="button"><span class="export-icon clean-icon">✓</span><div><strong>clean.csv</strong><small>Normalized, valid, unique rows</small></div><b id="download-clean-count">0 rows</b></button>
+              <button data-download="rejected.csv" type="button"><span class="export-icon reject-icon">!</span><div><strong>rejected.csv</strong><small>Invalid or missing required values</small></div><b id="download-rejected-count">0 rows</b></button>
+              <button data-download="duplicates.csv" type="button"><span class="export-icon dupe-icon">=</span><div><strong>duplicates.csv</strong><small>Exact matches and original row links</small></div><b id="download-duplicate-count">0 rows</b></button>
+              <button data-download="preflight-report.csv" type="button"><span class="export-icon report-icon">≡</span><div><strong>preflight-report.csv</strong><small>Status, issues, and every automatic change</small></div><b id="download-report-count">0 rows</b></button>
+            </div>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <div class="processing-overlay hidden" id="processing-overlay" aria-live="assertive">
+      <div><span class="processing-mark"><i></i><i></i><i></i></span><strong id="processing-title">Reading CSV…</strong><small id="processing-detail">Processing inside this browser tab</small></div>
+    </div>
+  </body>
+</html>
