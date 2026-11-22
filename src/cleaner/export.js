@@ -28,7 +28,7 @@ export function createExportBundle(result, headers) {
     'clean.csv': unparse(cleanRows, headers),
     'rejected.csv': unparse(rejectedRows, rejectedColumns),
     'duplicates.csv': unparse(duplicateRows, duplicateColumns),
-    'preflight-report.csv': unparse(reportRows, reportColumns),
+    'full-report.csv': unparse(reportRows, reportColumns),
   };
 }
 

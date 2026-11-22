@@ -18,8 +18,8 @@ CSV Import Preflight checks and cleans a CSV in your browser before you import i
 4. Choose whether exact Email and Phone matches count as duplicates.
 5. Choose the default country for phone numbers without a `+` country code.
 6. Choose the expected order for ambiguous numeric dates.
-7. Select **Run preflight**.
-8. Review Ready, Auto-fixed, Rejected, and Duplicate rows.
+7. Optionally open **Contact cleanup** and choose columns for name, company, country, or address.
+8. Select **Preview results**. Review Ready, Auto-fixed, Rejected, and Duplicate rows. If contact edits are proposed, compare original and proposed values, then apply the edits to unlock downloads or select **Edit rules** to revise them.
 9. Download the files you need.
 
 ## Result meanings
@@ -38,12 +38,13 @@ CSV Import Preflight checks and cleans a CSV in your browser before you import i
 | `clean.csv` | Valid, normalized, unique rows that are ready for import. |
 | `rejected.csv` | Original rejected rows with source row numbers and issue codes. |
 | `duplicates.csv` | Exact duplicates with the source row and first matching row. |
-| `preflight-report.csv` | One audit record per source row, including status, issues, and automatic changes. |
+| `full-report.csv` | One record per source row, including status, issues, and automatic changes. |
 
 ## Current beta limits
 
 - CSV only; no XLS or XLSX.
 - One mapped Email, Phone, and Date column per run.
+- Optional contact cleanup handles simple name capitalization, company and address spacing, and a limited set of recognized country codes. It does not verify addresses, split names, or infer a missing country.
 - Numeric dates only.
 - Exact-match deduplication only; no fuzzy matching.
 - Email format checking does not prove that an inbox exists.

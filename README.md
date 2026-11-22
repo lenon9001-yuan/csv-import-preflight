@@ -31,4 +31,4 @@ The generated `dist/` directory can be deployed to Vercel as a static Vite proje
 - Required-field, email, phone, and date validation.
 - Exact-match deduplication by mapped email and phone columns.
 - Local normalization with a per-row audit trail.
-- Separate `clean.csv`, `rejected.csv`, `duplicates.csv`, and `preflight-report.csv` downloads.
+- Separate `clean.csv`, `rejected.csv`, `duplicates.csv`, and `full-report.csv` downloads.

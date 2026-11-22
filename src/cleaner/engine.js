@@ -1,6 +1,7 @@
 import { parsePhoneNumberFromString } from 'libphonenumber-js/min';
 
 import { normalizeDate } from './dates.js';
+import { contactRules } from './contact-fields.js';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
 const FORMULA_PATTERN = /^[=@]/;
@@ -34,7 +35,13 @@ export function processRows(rows, config) {
     dedupeFields = [],
     defaultCountry = '',
     dateOrder = 'AUTO',
+    contactFields = {},
   } = config;
+
+  const contactChecks = Object.entries(contactRules).flatMap(([kind, rule]) => {
+    const field = contactFields[kind];
+    return headers.includes(field) ? [{ field, ...rule }] : [];
+  });
 
   const prepared = rows.map((sourceRow) => {
     const original = Object.fromEntries(headers.map((header) => [header, String(sourceRow[header] ?? '')]));
@@ -53,6 +60,13 @@ export function processRows(rows, config) {
 
     for (const field of requiredFields) {
       if (isBlank(normalized[field])) issues.push(makeIssue('MISSING_REQUIRED', field, `${field} is required.`));
+    }
+
+    for (const { field, normalize, reason } of contactChecks) {
+      const before = normalized[field];
+      const after = normalize(before);
+      addChange(changes, field, before, after, reason);
+      normalized[field] = after;
     }
 
     if (emailField && !isBlank(normalized[emailField])) {

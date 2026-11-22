@@ -15,6 +15,7 @@ const state = {
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
+const contactSelectors = Object.fromEntries(['name', 'company', 'country', 'address'].map((kind) => [kind, $(`#contact-${kind}`)]));
 
 const elements = {
   fileInput: $('#file-input'),
@@ -177,6 +178,11 @@ function prepareMapping() {
   populateFieldSelect(elements.emailField, email);
   populateFieldSelect(elements.phoneField, phone);
   populateFieldSelect(elements.dateField, date);
+  Object.values(contactSelectors).forEach((select) => {
+    populateFieldSelect(select, '');
+    select.options[0].textContent = 'Do not adjust';
+  });
+  $('.contact-rules').open = false;
   renderRequiredFields([name, email].filter(Boolean));
   renderDedupeFields();
   renderSourcePreview();
@@ -317,11 +323,46 @@ function renderResults() {
   renderResultsTable('all');
 }
 
+function renderContactPreview() {
+  const fields = Object.values(state.config.contactFields).filter(Boolean);
+  const rows = [];
+  let count = 0;
+  if (fields.length) {
+    for (const row of state.result.report) {
+      for (const field of fields) {
+        if (row.original[field] === row.normalized[field]) continue;
+        count++;
+        if (rows.length < 50) rows.push([row.rowNumber, field, row.original[field], row.normalized[field]]);
+      }
+    }
+  }
+  $('#contact-review').classList.toggle('hidden', !count);
+  $('#export-section').classList.toggle('hidden', Boolean(count));
+  $('#apply-contact-edits').classList.remove('hidden');
+  $('#contact-review-title').textContent = 'Review proposed edits';
+  $('#contact-review-status').textContent = count ? 'Apply these edits or go back to change your rules.' : '';
+  $('#contact-preview-count').textContent = count > rows.length
+    ? `First ${rows.length} of ${count.toLocaleString()} edits. Applying includes all edits.`
+    : `${count.toLocaleString()} proposed ${count === 1 ? 'edit' : 'edits'}`;
+  const table = $('#contact-preview');
+  const head = document.createElement('thead');
+  const headings = head.insertRow();
+  ['Source row', 'Column', 'Original', 'Proposed'].forEach((label) => appendCell(headings, label, 'th'));
+  const body = document.createElement('tbody');
+  rows.forEach((values) => {
+    const row = body.insertRow();
+    values.forEach((value) => appendCell(row, value));
+  });
+  table.replaceChildren(head, body);
+  return count > 0;
+}
+
 async function runPreflight() {
   clearError();
-  const specialFields = [elements.emailField.value, elements.phoneField.value, elements.dateField.value].filter(Boolean);
+  const contactFields = Object.fromEntries(Object.entries(contactSelectors).map(([kind, select]) => [kind, select.value]));
+  const specialFields = [elements.emailField.value, elements.phoneField.value, elements.dateField.value, ...Object.values(contactFields)].filter(Boolean);
   if (new Set(specialFields).size !== specialFields.length) {
-    showError('Email, phone, and date must map to different columns.');
+    showError('Choose a different column for each field rule.');
     return;
   }
 
@@ -334,13 +375,15 @@ async function runPreflight() {
     dedupeFields: getCheckedValues('dedupe-field'),
     defaultCountry: elements.defaultCountry.value,
     dateOrder: elements.dateOrder.value,
+    contactFields,
   };
 
   setProcessing(true, 'Running preflight…', `Checking ${state.parsed.rowCount.toLocaleString()} rows locally`);
   await new Promise((resolve) => window.setTimeout(resolve, 80));
   try {
     state.result = processRows(state.parsed.rows, state.config);
-    state.bundle = createExportBundle(state.result, state.parsed.headers);
+    state.bundle = null;
+    if (!renderContactPreview()) state.bundle = createExportBundle(state.result, state.parsed.headers);
     renderResults();
     showStage(3);
   } catch (error) {
@@ -409,6 +452,23 @@ elements.mappingForm.addEventListener('submit', (event) => {
   runPreflight();
 });
 elements.startOver.addEventListener('click', resetApp);
+$('#edit-rules').addEventListener('click', () => {
+  state.bundle = null;
+  clearError();
+  showStage(2);
+});
+$('#apply-contact-edits').addEventListener('click', () => {
+  if (!state.result || state.bundle) return;
+  state.bundle = createExportBundle(state.result, state.parsed.headers);
+  $('#apply-contact-edits').classList.add('hidden');
+  $('#contact-review-title').textContent = 'Applied contact edits';
+  $('#contact-preview th:last-child').textContent = 'Updated';
+  $('#contact-preview-count').textContent = $('#contact-preview-count').textContent
+    .replace('proposed ', '').replace(' Applying includes all edits.', '');
+  $('#contact-review-status').textContent = 'Edits applied. Your downloads are ready below.';
+  $('#export-section').classList.remove('hidden');
+  $('#edit-rules').focus({ preventScroll: true });
+});
 
 $$('.metric').forEach((metric) => metric.addEventListener('click', () => renderResultsTable(metric.dataset.filter)));
 $$('[data-download]').forEach((button) => button.addEventListener('click', () => {

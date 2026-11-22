@@ -71,10 +71,30 @@ describe('preflight engine', () => {
     const parsed = parseCsvText(fixture('missing-required.csv'));
     const result = processRows(parsed.rows, baseConfig(parsed.headers));
     const bundle = createExportBundle(result, parsed.headers);
-    expect(Object.keys(bundle)).toEqual(['clean.csv', 'rejected.csv', 'duplicates.csv', 'preflight-report.csv']);
+    expect(Object.keys(bundle)).toEqual(['clean.csv', 'rejected.csv', 'duplicates.csv', 'full-report.csv']);
     expect(bundle['clean.csv']).toContain('lee@example.com');
     expect(bundle['rejected.csv']).toContain('MISSING_REQUIRED');
-    expect(bundle['preflight-report.csv']).toContain('source_row');
+    expect(bundle['full-report.csv']).toContain('source_row');
+  });
+
+  it('applies selected contact rules without guessing unknown values or altering source data', () => {
+    const headers = ['Name', 'Company', 'Country', 'Address'];
+    const rows = [
+      { __rowNumber: 2, Name: 'MAYA  Tan', Company: 'NASA  Labs LLC', Country: 'uK', Address: '12  Cedar Lane\nUnit  02' },
+      { __rowNumber: 3, Name: "李明 McDonald O'Neil", Company: 'iCloud', Country: 'Unknown', Address: '001  Oak Road' },
+    ];
+    const config = { headers, contactFields: { name: 'Name', company: 'Company', country: 'Country', address: 'Address' } };
+    const result = processRows(rows, config);
+    expect(result.clean[0].normalized).toEqual({
+      Name: 'Maya Tan', Company: 'NASA Labs LLC', Country: 'GB', Address: '12 Cedar Lane\nUnit 02',
+    });
+    expect(result.clean[1].normalized).toMatchObject({ Name: rows[1].Name, Company: 'iCloud', Country: 'Unknown', Address: '001 Oak Road' });
+    expect(result.clean[0].original).toMatchObject({ Name: 'MAYA  Tan', Country: 'uK' });
+    expect(result.clean[0].changes.map(({ field }) => field)).toEqual(headers);
+    const bundle = createExportBundle(result, headers);
+    expect(bundle['full-report.csv']).toContain('MAYA  Tan');
+    expect(bundle['full-report.csv']).toContain('Maya Tan');
+    expect(processRows(rows, { headers }).clean[0].changes).toEqual([]);
   });
 
   it('rejects spreadsheet-formula values and escapes them in exports', () => {

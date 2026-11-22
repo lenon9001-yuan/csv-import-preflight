@@ -102,6 +102,17 @@
               </div>
             </section>
 
+            <details class="mapping-block contact-rules">
+              <summary><strong>Contact cleanup</strong><span>Optional</span></summary>
+              <p>Choose a column for each rule you want to try. Review proposed edits before exporting.</p>
+              <div class="select-grid contact-grid">
+                <label><span>Name column</span><select id="contact-name"></select><small>Tidy spacing and simple capitalization. Names stay in one column.</small></label>
+                <label><span>Company column</span><select id="contact-company"></select><small>Remove extra spaces. Keep spelling and capitalization.</small></label>
+                <label><span>Country column</span><select id="contact-country"></select><small>Use country codes for recognized values, such as Malaysia → MY. Keep unknown values.</small></label>
+                <label><span>Address column</span><select id="contact-address"></select><small>Remove extra spaces. Keep line breaks, spelling, and postal codes.</small></label>
+              </div>
+            </details>
+
             <section class="mapping-block">
               <div class="block-heading"><span>Required fields</span><p>Rows missing one of these fields go to <code>rejected.csv</code>.</p></div>
               <div class="check-grid" id="required-fields"></div>
@@ -137,7 +148,7 @@
 
             <div class="form-footer">
               <p><span>◆</span> The original file stays untouched.</p>
-              <button class="primary-button run-button" type="submit">Run preflight <span>→</span></button>
+              <button class="primary-button run-button" type="submit">Preview results <span>→</span></button>
             </div>
           </form>
         </section>
@@ -156,6 +167,19 @@
             <button class="metric metric-dupe" data-filter="duplicate" type="button"><span>Duplicates</span><strong id="metric-duplicates">0</strong><small>separated safely</small></button>
           </div>
 
+          <section class="review-block contact-review hidden" id="contact-review" aria-labelledby="contact-review-title">
+            <div class="review-toolbar">
+              <div><span class="mono-label">Contact cleanup</span><strong id="contact-review-title">Review proposed edits</strong></div>
+              <p id="contact-preview-count"></p>
+            </div>
+            <div class="data-table-wrap"><table id="contact-preview"></table></div>
+            <div class="contact-review-actions">
+              <button class="primary-button" id="apply-contact-edits" type="button">Apply and unlock downloads</button>
+              <p id="contact-review-status" role="status"></p>
+            </div>
+          </section>
+          <button class="secondary-button edit-rules" id="edit-rules" type="button">Edit rules</button>
+
           <section class="review-block">
             <div class="review-toolbar">
               <div><span class="mono-label">Row manifest</span><strong id="filter-title">All rows</strong></div>
@@ -164,19 +188,20 @@
             <div class="data-table-wrap results-table-wrap"><table id="results-table"></table></div>
           </section>
 
-          <section class="export-section">
+          <section class="export-section" id="export-section">
             <div class="export-heading"><span class="mono-label">Export package</span><h2>Four files. No mystery.</h2><p>Each download has one job, so you can import clean records and review everything else separately.</p></div>
             <div class="export-grid">
               <button data-download="clean.csv" type="button"><span class="export-icon clean-icon">✓</span><div><strong>clean.csv</strong><small>Normalized, valid, unique rows</small></div><b id="download-clean-count">0 rows</b></button>
               <button data-download="rejected.csv" type="button"><span class="export-icon reject-icon">!</span><div><strong>rejected.csv</strong><small>Invalid or missing required values</small></div><b id="download-rejected-count">0 rows</b></button>
               <button data-download="duplicates.csv" type="button"><span class="export-icon dupe-icon">=</span><div><strong>duplicates.csv</strong><small>Exact matches and original row links</small></div><b id="download-duplicate-count">0 rows</b></button>
-              <button data-download="preflight-report.csv" type="button"><span class="export-icon report-icon">≡</span><div><strong>preflight-report.csv</strong><small>Status, issues, and every automatic change</small></div><b id="download-report-count">0 rows</b></button>
+              <button data-download="full-report.csv" type="button"><span class="export-icon report-icon">≡</span><div><strong>full-report.csv</strong><small>Status, issues, and changes for every row</small></div><b id="download-report-count">0 rows</b></button>
             </div>
           </section>
         </section>
       </section>
     </main>
 
+    <footer class="app-footer"><a href="/about/">About</a><a href="/terms/">Terms</a><a href="/privacy-policy/">Privacy Policy</a><a href="/contact/">Contact</a></footer>
     <div class="processing-overlay hidden" id="processing-overlay" aria-live="assertive">
       <div><span class="processing-mark"><i></i><i></i><i></i></span><strong id="processing-title">Reading CSV…</strong><small id="processing-detail">Processing inside this browser tab</small></div>
     </div>
