@@ -1,4 +1,5 @@
 import './app.css';
+import './palette.css';
 
 import { processRows } from './cleaner/engine.js';
 import { createExportBundle, downloadCsv } from './cleaner/export.js';
