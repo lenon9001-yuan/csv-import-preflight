@@ -1,5 +1,4 @@
 import './style.css';
-import './palette.css';
 
 const scanButton = document.querySelector('#scan-button');
 const scanStatus = document.querySelector('#scan-status');
