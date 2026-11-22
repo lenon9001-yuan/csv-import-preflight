@@ -3,9 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Check and clean a CSV locally before importing it into your CRM." />
+    <meta name="description" content="Free CSV validator for files up to 20 MB. Check headers, required fields, emails, phone numbers, and dates in your browser before a CRM import." />
     <meta name="theme-color" content="#eef3f9" />
-    <title>CSV Import Preflight — Local cleaner</title>
+    <link rel="canonical" href="https://csv-import-preflight.vercel.app/app/" />
+    <title>Free CSV Validator and Checker | CSV Import Preflight</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet" />
@@ -60,7 +61,7 @@
 
         <section class="stage active" id="stage-load" aria-labelledby="load-title">
           <div class="workspace-heading">
-            <div><span class="mono-label">Step 1 · Load</span><h1 id="load-title">Bring the file.<br />Keep the data.</h1></div>
+            <div><span class="mono-label">Step 1 · Load</span><h1 id="load-title">Free CSV Validator</h1></div>
             <p>Choose one CSV from your device. It is parsed inside this browser tab and is never sent to our server.</p>
           </div>
 
@@ -77,6 +78,19 @@
             <div><span class="mono-label">No file ready?</span><strong>Take the sample route</strong><p>Use 8 fictional contacts with duplicates, formatting changes, and invalid fields.</p></div>
             <button class="secondary-button" id="load-sample" type="button">Load fictional sample <span>→</span></button>
           </div>
+
+          <section class="validator-details" aria-labelledby="validation-checks-title">
+            <h2 id="validation-checks-title">What the CSV checker looks for</h2>
+            <ul>
+              <li><strong>CSV structure.</strong> Detect empty or duplicate column headers and rows with too many or too few fields.</li>
+              <li><strong>Contact data.</strong> Choose required fields and map an email, phone, or date column. The checker flags missing values and invalid formats, and can standardize valid phone numbers and numeric dates.</li>
+              <li><strong>Exact duplicates.</strong> Find repeated contacts using the email or phone columns you select.</li>
+            </ul>
+            <h3>File requirements</h3>
+            <p>Use a .csv file with a header row and at least one data row. The limits are 20 MB and 200 columns per file. UTF-8 and 50,000 data rows or fewer are recommended.</p>
+            <h3>Try the checks on sample data</h3>
+            <p>Load the fictional sample and keep the default rules. Of its 8 contacts, 4 appear in <code>clean.csv</code>, 3 in <code>rejected.csv</code>, and 1 in <code>duplicates.csv</code>. The <code>full-report.csv</code> records the outcome for all 8.</p>
+          </section>
         </section>
 
         <section class="stage" id="stage-map" aria-labelledby="map-title">
